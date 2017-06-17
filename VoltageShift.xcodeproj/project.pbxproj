@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 48;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -195,7 +195,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0830;
-				ORGANIZATIONNAME = "Andy Vandijck";
+				ORGANIZATIONNAME = SiCreative;
 				TargetAttributes = {
 					AB1B031317E25FC000DD337E = {
 						DevelopmentTeam = 7698T37TAB;
@@ -204,7 +204,7 @@
 				};
 			};
 			buildConfigurationList = ABC74EF617983B9900B182E7 /* Build configuration list for PBXProject "VoltageShift" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (

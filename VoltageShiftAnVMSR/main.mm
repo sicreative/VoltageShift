@@ -693,7 +693,7 @@ int showcpuinfo(){
     
     if (ret != KERN_SUCCESS)
     {
-        printf("Can't read voltage 0x198 \n");
+        printf("Can't read voltage 0x198\n");
         return (1);
 
         
