@@ -17,29 +17,8 @@ Build the kernel extension (kext):
 
      xcodebuild  -target VoltageShift.kext
      
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 change the owner to root:wheel for the kext <br />
       sudo chown -R root:wheel build/Release/VoltageShift.kext
-<<<<<<< HEAD
-=======
-change the owner to root:wheel for the kext 
-=======
-change the owner to root:wheel for the kext <br />
->>>>>>> f388995... Update README.md
-=======
-change the owner to root:wheel for the kext <br />
->>>>>>> f388995... Update README.md
-      sudo chown -R root:wheel build/Release/V.kext
->>>>>>> b29bd67... Create README.md
-=======
-change the owner to root:wheel for the kext 
-      sudo chown -R root:wheel build/Release/V.kext
->>>>>>> b29bd67... Create README.md
-=======
->>>>>>> b2833a8... Update README.md
     
 Build the command line tool:
 
@@ -49,10 +28,6 @@ Build the command line tool:
 
 Usage
 --------
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 This program is a command tools that support Haswell and Broadwell  Mac Device for undervoltage.
 
 This use 'Intel Overclock Mailbox' for control the voltage offset, 
@@ -67,37 +42,6 @@ the launchd for automative apply on startup and maintance the setting transparen
 
 This program support macOS 10.12 or above, however need to switch off the SIP for unsigned kext under Recovery mode:
 
-=======
-=======
->>>>>>> b29bd67... Create README.md
-This program is a command tools that support Haswell and Bradwell (may support Skylake) Mac Device for undervoltage.
-=======
-This program is a command tools that support Haswell and Bradwell  Mac Device for undervoltage.
->>>>>>> 5f00ae4... Update README.md
-=======
-This program is a command tools that support Haswell and Broadwell  Mac Device for undervoltage.
->>>>>>> 2256d4c... Update README.md
-
-This use 'Intel Overclock Mailbox' for control the voltage offset, 
-Your system may locked of the OC Mailbox and not avilable for undervoltage.
-
-Undervoltage can reduced heat and sustain Turbo boost longer, provide longer battery preformance,although may unstable for the system.
-
-This program do not provided GUI interface because this tools only load the MSR driver when apply, amend or read,
-the MSR driver will load and unloaded immediately for more security and lowest resource usage,
-after you test well, you can use our tools build up 
-the launchd for automative apply on startup and maintance the setting transparently, please read below for detail. 
-
-<<<<<<< HEAD
-This program support macOS 10.12 or above, however need to switch off the SIP kext under Recovery mode:
-<<<<<<< HEAD
->>>>>>> b29bd67... Create README.md
-=======
->>>>>>> b29bd67... Create README.md
-=======
-This program support macOS 10.12 or above, however need to switch off the SIP for unsigned kext under Recovery mode:
-
->>>>>>> 5d64146... Update README.md
 Push `Cmd`+`R` when boot to Recovery mode, select Terminal at toolbar and enter: 
     
     csrutil enable --without kext
@@ -105,19 +49,6 @@ Push `Cmd`+`R` when boot to Recovery mode, select Terminal at toolbar and enter:
 After reboot, ensure the kext and the command tool files on some directory.
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-Info
-
->>>>>>> b29bd67... Create README.md
-=======
-Info
-
->>>>>>> b29bd67... Create README.md
-=======
->>>>>>> 5d64146... Update README.md
 You can view your current voltage offset,CPU freqency,power and temperture setting by following command:
 
     ./voltageshift info
@@ -126,19 +57,7 @@ You can continous monitor the CPU freqency,power and temperture by using:
 
     ./voltageshift mon
     
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Six type of voltage offset you can change, however we only suggest undervoltage of CPU and GPU.
-=======
-Six type voltage offset you can change, however we only suggest undervoltage of CPU and GPU tempeture.
->>>>>>> b29bd67... Create README.md
-=======
-Six type voltage offset you can change, however we only suggest undervoltage of CPU and GPU tempeture.
->>>>>>> b29bd67... Create README.md
-=======
-Six type of voltage offset you can change, however we only suggest undervoltage of CPU and GPU.
->>>>>>> 5f00ae4... Update README.md
 
     ./voltageshift offset <CPU> <GPU> <CPUCache> <SystemAgency> <Analogy I/O> <Digital I/O>
     
@@ -159,27 +78,9 @@ by default the Macbook will delay 'Suspend to Disk' after three hours from 'Susp
     
 for example:
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 18000
 
 set system auto apply CPU -50mv and GPU -50mv every boot and every 3 hour.
-=======
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 
-
-set system auto apply CPU -50mv and GPU -50mv every boot and every 2.5hour.
->>>>>>> b29bd67... Create README.md
-=======
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 
-
-set system auto apply CPU -50mv and GPU -50mv every boot and every 2.5hour.
->>>>>>> b29bd67... Create README.md
-=======
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 18000
-
-set system auto apply CPU -50mv and GPU -50mv every boot and every 3 hour.
->>>>>>> 351108b... Update README.md
 
 
 You can remove the launchd by following command:
@@ -187,19 +88,7 @@ You can remove the launchd by following command:
      ./voltageshift removelaunchd
      
      
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 We also suggest run removelaunchd and them buildlaunchd if you need change the launchd setting. 
-=======
-
->>>>>>> b29bd67... Create README.md
-=======
-
->>>>>>> b29bd67... Create README.md
-=======
-We also suggest run removelaunchd and them buildlaunchd if you need change the launchd setting. 
->>>>>>> 8e4429c... Update README.md
 
 
 Additional
@@ -223,24 +112,6 @@ Additional
      ./voltageshift write <HEX_MSR> <HEX_VALUE>
  
    
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b29bd67... Create README.md
-   
-     
-     
-     
-
-
-<<<<<<< HEAD
->>>>>>> b29bd67... Create README.md
-=======
->>>>>>> b29bd67... Create README.md
-=======
->>>>>>> 5d64146... Update README.md
 
 
     
