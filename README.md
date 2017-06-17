@@ -52,6 +52,7 @@ Usage
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 This program is a command tools that support Haswell and Broadwell  Mac Device for undervoltage.
 
 This use 'Intel Overclock Mailbox' for control the voltage offset, 
@@ -73,6 +74,9 @@ This program is a command tools that support Haswell and Bradwell (may support S
 =======
 This program is a command tools that support Haswell and Bradwell  Mac Device for undervoltage.
 >>>>>>> 5f00ae4... Update README.md
+=======
+This program is a command tools that support Haswell and Broadwell  Mac Device for undervoltage.
+>>>>>>> 2256d4c... Update README.md
 
 This use 'Intel Overclock Mailbox' for control the voltage offset, 
 Your system may locked of the OC Mailbox and not avilable for undervoltage.
