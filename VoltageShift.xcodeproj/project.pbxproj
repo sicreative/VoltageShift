@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6170B2B71EF2F59F00CD0ADD /* VoltageShiftAnVMSR.h in Headers */ = {isa = PBXBuildFile; fileRef = 6170B2B61EF2F59F00CD0ADD /* VoltageShiftAnVMSR.h */; };
+		61C882131EFAFA77001DE175 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 61C882121EFAFA77001DE175 /* README.md */; };
 		AB1B031717E25FC000DD337E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB1B031617E25FC000DD337E /* Foundation.framework */; };
 		AB1B032217E25FCE00DD337E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABC74F3717985FCE00B182E7 /* IOKit.framework */; };
 		AB1B032317E25FFA00DD337E /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABC74F2B1798553700B182E7 /* main.mm */; };
@@ -29,6 +30,7 @@
 
 /* Begin PBXFileReference section */
 		6170B2B61EF2F59F00CD0ADD /* VoltageShiftAnVMSR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VoltageShiftAnVMSR.h; sourceTree = "<group>"; };
+		61C882121EFAFA77001DE175 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AB1B031417E25FC000DD337E /* voltageshift */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = voltageshift; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB1B031617E25FC000DD337E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		ABC74EFE17983B9900B182E7 /* VoltageShift.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoltageShift.kext; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,6 +77,7 @@
 		ABC74EF117983B9900B182E7 = {
 			isa = PBXGroup;
 			children = (
+				61C882121EFAFA77001DE175 /* README.md */,
 				AB3231E617E29BCB00043814 /* Frameworks */,
 				ABC74F0317983B9900B182E7 /* VoltageShiftAnVMSR */,
 				ABC74F2A1798553700B182E7 /* voltageshift */,
@@ -255,6 +258,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				61C882131EFAFA77001DE175 /* README.md in Sources */,
 				AB47DDBA17E2893200840FD1 /* VoltageShfitAnVMSR.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

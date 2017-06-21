@@ -69,12 +69,13 @@ If setting too low the system will freezing, please switch OFF fully and turn on
 
 After you test well and comfort the setting, you can apply the launchd: (require sudo root)
 
-    sudo ./voltageshift buildlaunchd  <CPU> <GPU> <CPUCache> <SystemAgency> <Analogy I/O> <Digital I/O> <CheckSecond>
+    sudo ./voltageshift buildlaunchd  <CPU> <GPU> <CPUCache> <SystemAgency> <Analogy I/O> <Digital I/O> <Update Mins>
 
-The last <CheckSecond> is the interval of the tool check and ameded, the Default value is 150min,
-as the offset values will reset after fully switch off or hibernate (suspend to Disk), 
-by default the Macbook will delay 'Suspend to Disk' after three hours from 'Suspend to RAM' when using Battery, 
-2.5 hours is enough the tool amended the value after wake from Suspend to disk, you can override this value.     
+The last <Mins> is the update interval of the tool check and changed, the Default value is 160min,
+ deepsleep (suspend to Disk) will reset of the voltage setting, as sleep (suspend to memory) will not change the sleep value, it will scheduled check the setting in peroid, and amend if need.
+
+     0 for only apply the setting when bootup.
+
     
 for example:
 

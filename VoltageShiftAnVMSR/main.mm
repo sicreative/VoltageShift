@@ -105,13 +105,13 @@ void usage(const char *name)
 {
     
     printf("--------------------------------------------------------------------------\n");
-    printf("VoltageShift Undervoltage Tool v 0.1 for Intel Haswell / Broadwell \n");
+    printf("VoltageShift Undervoltage Tool v 0.2 for Intel Haswell / Broadwell \n");
     printf("Copyright (C) 2017 SC Lee \n");
     printf("--------------------------------------------------------------------------\n");
 
     printf("Usage:\n");
     printf("set voltage:  \n    %s offset <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O>\n\n", name);
-    printf("set boot and auto apply:\n  sudo %s buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <UpdateSecond>\n\n", name);
+    printf("set boot and auto apply:\n  sudo %s buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <UpdateMins (0 only apply bootup)> \n\n", name);
     printf("remove boot and auto apply:\n    %s removelaunchd \n\n", name);
      printf("get info of current setting:\n    %s info \n\n", name);
     printf("continus monitor of CPU:\n    %s mon \n\n", name);
@@ -1064,8 +1064,17 @@ void removeLaunchDaemons(){
 
 }
 
-void writeLaunchDaemons(std::vector<int>  values = {0},int second = 9000  ) {
+void writeLaunchDaemons(std::vector<int>  values = {0},int min = 160  ) {
     std::stringstream output;
+    
+    if (min>720){
+          printf("------------------------------------\n");
+        printf("Out of Interval setting, please select between 0 (Run only bootup) to 720mins \n");
+        printf("------------------------------------\n");
+        return;
+
+    }
+        
     
 
     printf("Build for LaunchDaemons of Auto Apply for VoltageShift\n");
@@ -1073,7 +1082,7 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int second = 9000  ) {
    
     
    
-
+  output.str("sudo rm -R /Library/Application\\ Support/VoltageShift/");
     
      output.str("sudo rm /Library/LaunchDaemons/com.sicreative.VoltageShift.plist");
      system(output.str().c_str());
@@ -1083,6 +1092,7 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int second = 9000  ) {
     //add 0 for no user input field
     for (int i=(int)values.size();i<=6;i++){
         values.push_back(0);
+        
     }
     
     
@@ -1105,12 +1115,57 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int second = 9000  ) {
        << "</string>";
     }
       
-   output << "</array>"
-   << "<key>StartInterval</key>"
+   output << "</array>";
+    
+    
+    
+    // Change of use StartCalendarInterval for better support asleep (suspend to disk) wakeup
+   /*
+   output << "<key>StartInterval</key>"
    << "<integer>"
-   << second
-   << "</integer>"
-   << "</dict>"
+   << min
+   << "</integer>";
+    
+    */
+    
+    
+    if (min>0){
+    
+    output << "<key>StartCalendarInterval</key>"
+    << "<array>";
+    
+
+
+    if (min<=60 && 60%min==0){
+        for (int i=0;i<60;i+=min){
+          output  << "<dict>"
+            << "<key>Minute</key>"
+            << "<integer>"
+            << i
+            << "</integer>"
+            << "</dict>";
+        }
+
+    }else{
+        for (int i=0;i<1440;i+=min){
+            output  << "<dict>"
+            << "<key>Hour</key>"
+            << "<integer>"
+            << i/60
+            << "</integer>"
+            << "<key>Minute</key>"
+            << "<integer>"
+            << i%60
+            << "</integer>"
+            << "</dict>";
+        }
+        
+    }
+    
+    output << "</array>";
+
+    }
+   output << "</dict>"
    << "</plist>"
     << "\" > /Library/LaunchDaemons/com.sicreative.VoltageShift.plist"
     << " ";
@@ -1216,7 +1271,7 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int second = 9000  ) {
     printf("Finished install the LaunchDaemons, Please Reboot\n\n");
     printf("--------------------------------------------------------------------------\n");
     
-    printf("The system will apply below undervoltage setting \n value for boot and Amend every %d mins\n", second/60);
+    printf("The system will apply below undervoltage setting \n value for boot and Amend every %d mins\n", min);
 
    printf("--------------------------------------------------------------------------\n");
      printf("************************************************************************\n");
