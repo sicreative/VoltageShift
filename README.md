@@ -79,9 +79,9 @@ The last <Mins> is the update interval of the tool check and changed, the Defaul
     
 for example:
 
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 18000
+    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 60
 
-set system auto apply CPU -50mv and GPU -50mv every boot and every 3 hour.
+set system auto apply CPU -50mv and GPU -50mv every boot and every 1 hour.
 
 
 You can remove the launchd by following command:
