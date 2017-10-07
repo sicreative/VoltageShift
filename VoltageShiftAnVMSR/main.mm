@@ -550,10 +550,32 @@ int showcpuinfo(){
         
    
         
-        uint64 firsttime = clock_gettime_nsec_np(CLOCK_REALTIME);
+        //uint64 firsttime = clock_gettime_nsec_np(CLOCK_REALTIME);
+        uint64 firsttime;
         
+        in.msr = 0x637;
+        in.action = AnVMSRActionMethodRDMSR;
+        in.param = 0;
+        ret = IOConnectCallStructMethod(connect,
+                                        AnVMSRActionMethodRDMSR,
+                                        &in,
+                                        sizeof(in),
+                                        &out,
+                                        &outsize
+                                        );
         
+        if (ret != KERN_SUCCESS)
+        {
+           firsttime = clock_gettime_nsec_np(CLOCK_REALTIME)/1000;
+           // printf("Can't read  0xe7 ");
+          //  return (1);
+            
+            
+        }else{
+            firsttime = out.param /24 ;
+        }
         
+         
         
         usleep(100000);
         
@@ -604,14 +626,37 @@ int showcpuinfo(){
         unsigned long long e8 = out.param;
         
         
+        in.msr = 0x637;
+        in.action = AnVMSRActionMethodRDMSR;
+        in.param = 0;
+        ret = IOConnectCallStructMethod(connect,
+                                        AnVMSRActionMethodRDMSR,
+                                        &in,
+                                        sizeof(in),
+                                        &out,
+                                        &outsize
+                                        );
+        
+        uint64 secondtime;
+        
+        if (ret != KERN_SUCCESS)
+        {
+            secondtime = clock_gettime_nsec_np(CLOCK_REALTIME)/1000;
+            // printf("Can't read  0xe7 ");
+            //  return (1);
+            
+            
+        }else{
+            secondtime = out.param /24;
+        }
         
         
+  
         
-        
-          uint64 secondtime = clock_gettime_nsec_np(CLOCK_REALTIME);
+        //  uint64 secondtime = clock_gettime_nsec_np(CLOCK_REALTIME);
         
         secondtime -= firsttime;
-        double second = (double)secondtime / 100000000;
+        double second = (double)secondtime / 100000;
         
         freq =   basefreq  / second * (  ((double)e8-le8)/((double)e7-le7));
         
