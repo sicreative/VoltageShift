@@ -105,7 +105,7 @@ void usage(const char *name)
 {
     
     printf("--------------------------------------------------------------------------\n");
-    printf("VoltageShift Undervoltage Tool v 0.2 for Intel Haswell / Broadwell \n");
+    printf("VoltageShift Undervoltage Tool v 1.1 for Intel Haswell / Broadwell \n");
     printf("Copyright (C) 2017 SC Lee \n");
     printf("--------------------------------------------------------------------------\n");
 
@@ -450,7 +450,7 @@ int showcpuinfo(){
     
     
     
-    do {
+  //  do {
         
         
         in.msr = 0x611;
@@ -504,7 +504,7 @@ int showcpuinfo(){
         unsigned long long lastpowercore = out.param;
         
 
-        
+         /*
         
         
         in.msr = 0xe7;
@@ -551,7 +551,11 @@ int showcpuinfo(){
    
         
         //uint64 firsttime = clock_gettime_nsec_np(CLOCK_REALTIME);
+          */
         uint64 firsttime;
+     
+     
+    
         
         in.msr = 0x637;
         in.action = AnVMSRActionMethodRDMSR;
@@ -575,11 +579,11 @@ int showcpuinfo(){
             firsttime = out.param /24 ;
         }
         
-         
+        
         
         usleep(100000);
         
-        
+        /*
         
         in.msr = 0xe7;
         in.action = AnVMSRActionMethodRDMSR;
@@ -624,7 +628,7 @@ int showcpuinfo(){
 
         }
         unsigned long long e8 = out.param;
-        
+         */
         
         in.msr = 0x637;
         in.action = AnVMSRActionMethodRDMSR;
@@ -636,6 +640,7 @@ int showcpuinfo(){
                                         &out,
                                         &outsize
                                         );
+        
         
         uint64 secondtime;
         
@@ -658,7 +663,7 @@ int showcpuinfo(){
         secondtime -= firsttime;
         double second = (double)secondtime / 100000;
         
-        freq =   basefreq  / second * (  ((double)e8-le8)/((double)e7-le7));
+        //   freq =   basefreq  / second * (  ((double)e8-le8)/((double)e7-le7));
         
         //    printf("RDMSR %x volt %f\n", (unsigned int)in.msr, basefreq);
         
@@ -717,9 +722,11 @@ int showcpuinfo(){
         
         
         
-    }while( freq < 200.0 || freq > (maxturbofreq + 100));
+    //}while( freq < 200.0 || freq > (maxturbofreq + 100));
     
     
+
+
     
   
     
@@ -749,6 +756,8 @@ int showcpuinfo(){
     
     
     double voltage  = out.param >> 32 & 0xFFFF;
+    freq = out.param >> 8 & 0xFF;
+    freq /= 10;
     voltage /= pow(2,13);
     
     if (dtsmax==0){
@@ -816,7 +825,7 @@ int showcpuinfo(){
     
     
     
-    printf("CPU Freq: %.2fmhz, Voltage: %.4fv, Power:pkg %.2fw /core %.2fw,Temp: %llu c", freq,voltage,powerpkg,powercore,temp);
+    printf("CPU Freq: %2.1fghz, Voltage: %.4fv, Power:pkg %2.2fw /core %2.2fw,Temp: %llu c", freq,voltage,powerpkg,powercore,temp);
     
 
     return (0);
