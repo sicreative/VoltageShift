@@ -105,16 +105,16 @@ void usage(const char *name)
 {
     
     printf("--------------------------------------------------------------------------\n");
-    printf("VoltageShift Undervoltage Tool v 1.1 for Intel Haswell / Broadwell \n");
+    printf("VoltageShift Undervoltage Tool v 1.1 for Intel Haswell+ \n");
     printf("Copyright (C) 2017 SC Lee \n");
     printf("--------------------------------------------------------------------------\n");
 
     printf("Usage:\n");
     printf("set voltage:  \n    %s offset <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O>\n\n", name);
-    printf("set boot and auto apply:\n  sudo %s buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <UpdateMins (0 only apply bootup)> \n\n", name);
+    printf("set boot and auto apply:\n  sudo %s buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <UpdateMins (0 only apply at bootup)> \n\n", name);
     printf("remove boot and auto apply:\n    %s removelaunchd \n\n", name);
      printf("get info of current setting:\n    %s info \n\n", name);
-    printf("continus monitor of CPU:\n    %s mon \n\n", name);
+    printf("continuous monitor of CPU:\n    %s mon \n\n", name);
     printf("read MSR: %s read <HEX_MSR>\n\n", name);
     printf("write MSR: %s write <HEX_MSR> <HEX_VALUE>\n\n", name);
 }
@@ -155,7 +155,7 @@ int writeOCMailBox (int domain,int offset){
         printf("VoltageShift offset Tool\n");
         printf("--------------------------------------------------------------------------\n");
         printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-        printf("You setting require over-clocked. This May Damaged you Computer !!!! \n");
+        printf("Your settings require overclocking. This May Damage you Computer !!!! \n");
         printf("use --damaged for override\n");
         printf("     usage: voltageshift --damage offset ... for run\n");
         printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
@@ -169,7 +169,7 @@ int writeOCMailBox (int domain,int offset){
         printf("VoltageShift offset Tool\n");
         printf("--------------------------------------------------------------------------\n");
         printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-        printf("You setting too low. Are you sure you want that values \n");
+        printf("Your settings are too low. Are you sure you want thosse values \n");
         printf("use --damaged for override\n");
         printf("     usage: voltageshift --damage offset ... for run\n");
         printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
@@ -1301,7 +1301,7 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int min = 160  ) {
         printf("--------------------------------------------------------------------------\n");
         printf("VoltageShift builddaemons Tool\n");
         printf("--------------------------------------------------------------------------\n");
-        printf("    Can't build the launchd.  No Sucessful of creat the files, please use:\n\n");
+        printf("    Can't build the launchd.  Can´t create the files, please use:\n\n");
                                                                                    
         printf("             sudo ./voltageshift buildlaunchd .... \n\n");
         printf("for Root privilege.\n");
@@ -1322,15 +1322,15 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int min = 160  ) {
     printf("VoltageShift builddaemons Tool\n");
     printf("--------------------------------------------------------------------------\n");
 
-    printf("Finished install the LaunchDaemons, Please Reboot\n\n");
+    printf("Finished installing the LaunchDaemons, Please Reboot\n\n");
     printf("--------------------------------------------------------------------------\n");
     
-    printf("The system will apply below undervoltage setting \n value for boot and Amend every %d mins\n", min);
+    printf("The system will apply the below undervoltage setting \n values for boot, and Amend every %d mins\n", min);
 
    printf("--------------------------------------------------------------------------\n");
      printf("************************************************************************\n");
-    printf("Please CONFIRM and TEST the system STABLE in below setting, \n otherwise REMOVE this launchd IMMEDIATELY \n");
-    printf("You can remove this by use: ./voltageshift removelaunchd\n ");
+    printf("Please CONFIRM and TEST the system STABILITY in the below settings, \n otherwise REMOVE this launchd IMMEDIATELY \n");
+    printf("You can remove this by using: ./voltageshift removelaunchd\n ");
     printf("Or manual remove by:\n");
     printf("sudo rm /Library/LaunchDaemons/com.sicreative.VoltageShift.plist\n ");
     printf("sudo rm -R /Library/Application\\ Support/VoltageShift \n");
@@ -1345,12 +1345,12 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int min = 160  ) {
     printf("--------------------------------------------------------------------------\n");
     printf("************************************************************************\n");
 
-    printf("Please notice if you cannot boot the system after installed, you need for:\n");
-    printf("1. Fully Switch off Computer (not reboot):\n");
+    printf("Please notice if you cannot boot the system after installing, you need to:\n");
+    printf("1. Fully turn off Computer (not reboot):\n");
     printf("2. Boot start by Command-R to recovery mode :\n");
-    printf("3. In \"Terminal\" Enable the CSR protect for stop undervoltage run when boot \n");
+    printf("3. In \"Terminal\" Enable the CSR protection to stop undervoltage running when boot \n");
     printf("4.       csrutil enable    \n");
-    printf("5. Reboot and Remove all file by above method\n");
+    printf("5. Reboot and Remove all file above\n");
     printf("--------------------------------------------------------------------------\n");
 
     
@@ -1450,7 +1450,7 @@ int main(int argc, const char * argv[])
         printf("------------------------------------------------------\n");
        printf("   VoltageShift Monitor Tool\n");
         printf("------------------------------------------------------\n");
-        printf("    Ctl-C for Exit\n\n");
+        printf("    Ctl-C to Exit\n\n");
              signal(SIGINT, intHandler);
             printf("   CPU voltage offset: %dmv\n",readOCMailBox(0));
             printf("   GPU voltage offset: %dmv\n",readOCMailBox(1));
