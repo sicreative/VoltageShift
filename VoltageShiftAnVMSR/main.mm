@@ -46,6 +46,8 @@ double basefreq = 0;
 double maxturbofreq = 0;
 double multturbofreq = 0;
 double fourthturbofreq = 0;
+double sixthturbofreq = 0;
+double eightthturbofreq = 0;
 double power_units = 0;
 uint64 dtsmax = 0;
 uint64 tempoffset = 0;
@@ -105,7 +107,7 @@ void usage(const char *name)
 {
     
     printf("--------------------------------------------------------------------------\n");
-    printf("VoltageShift Undervoltage Tool v 1.1 for Intel Haswell+ \n");
+    printf("VoltageShift Undervoltage Tool v 1.2 for Intel Haswell+ \n");
     printf("Copyright (C) 2017 SC Lee \n");
     printf("--------------------------------------------------------------------------\n");
 
@@ -115,6 +117,8 @@ void usage(const char *name)
     printf("remove boot and auto apply:\n    %s removelaunchd \n\n", name);
      printf("get info of current setting:\n    %s info \n\n", name);
     printf("continuous monitor of CPU:\n    %s mon \n\n", name);
+    printf("set Power Limit: %s power <PL1> <PL2>\n\n", name);
+    printf("set Turbo Enabled: %s turbo <0/1>\n\n", name);
     printf("read MSR: %s read <HEX_MSR>\n\n", name);
     printf("write MSR: %s write <HEX_MSR> <HEX_VALUE>\n\n", name);
 }
@@ -123,6 +127,32 @@ unsigned long long hex2int(const char *s)
 {
     return strtoull(s,NULL,16);
 }
+
+
+
+void printBits(size_t const size, void const * const ptr)
+{
+    unsigned char *b = (unsigned char*) ptr;
+    unsigned char byte;
+    int i, j;
+     printf("(");
+    
+    for (i=size-1;i>=0;i--)
+    {
+        
+        for (j=7;j>=0;j--)
+        {
+            byte = (b[i] >> j) & 1;
+            printf("%u", byte);
+        }
+        if (i!=0)
+            printf(" ");
+        else
+        puts(")");
+    }
+   // puts(" )");
+}
+
 
 // Read OC Mailbox
 // Ref of Intel Turbo Boost Max Technology 3.0 legacy (non HWP) enumeration driver
@@ -221,7 +251,7 @@ int writeOCMailBox (int domain,int offset){
     in.action = AnVMSRActionMethodWRMSR;
     in.param = value;
     
-  //  printf("WRMSR %x with value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)in.param);
+    printf("WRMSR %x with value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)in.param);
     
    // return (0);
     
@@ -273,7 +303,7 @@ int readOCMailBox (int domain){
     in.action = AnVMSRActionMethodWRMSR;
     in.param = value;
     
-    //printf("WRMSR %x with value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)in.param);
+    printf("WRMSR %x with value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)in.param);
     
     
     
@@ -339,7 +369,7 @@ int readOCMailBox (int domain){
         break;
     }
     
-  //  printf("RDMSR %x returns value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)out.param);
+    printf("RDMSR %x returns value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)out.param);
 
     int returnvalue = (int)(out.param >> 20) & 0xFFF;
     if (returnvalue > 2047){
@@ -362,11 +392,94 @@ int showcpuinfo(){
     double freq = 0;
     double powerpkg = 0;
     double powercore = 0;
+    bool oclocked = false;
+    bool turbodisable = false;
+    double p1power = 0;
+    double p2power = 0;
+    
     
     
     
     in.action = AnVMSRActionMethodRDMSR;
     in.param = 0;
+    
+    
+    if (p1power==0){
+        in.msr = 0x610;
+        ret = IOConnectCallStructMethod(connect,
+                                        AnVMSRActionMethodRDMSR,
+                                        &in,
+                                        sizeof(in),
+                                        &out,
+                                        &outsize
+                                        );
+        
+        if (ret != KERN_SUCCESS)
+        {
+            printf("Can't read  0x610 ");
+            
+            return (1);
+            
+        }
+        p1power = (double)(out.param & 0x7FFF ) / 8;
+        
+        p2power = (double)(out.param >> 32 & 0x7FFF ) / 8;
+        
+        
+        
+    }
+    
+    
+    if (turbodisable==false){
+        in.msr = 0x1a0;
+        ret = IOConnectCallStructMethod(connect,
+                                        AnVMSRActionMethodRDMSR,
+                                        &in,
+                                        sizeof(in),
+                                        &out,
+                                        &outsize
+                                        );
+        
+        if (ret != KERN_SUCCESS)
+        {
+            printf("Can't read  0x1ad ");
+            
+            return (1);
+            
+        }
+        
+        turbodisable = ((out.param >> 38 & 0x1) == 1);
+        
+        
+        
+    }
+    
+    
+    
+    if (oclocked==false){
+        in.msr = 0x194;
+        ret = IOConnectCallStructMethod(connect,
+                                        AnVMSRActionMethodRDMSR,
+                                        &in,
+                                        sizeof(in),
+                                        &out,
+                                        &outsize
+                                        );
+        
+        if (ret != KERN_SUCCESS)
+        {
+            printf("Can't read  0x194 ");
+            
+            return (1);
+            
+        }
+        
+        oclocked = ((out.param >> 20 & 0x1) == 1);
+           
+       
+        
+    }
+    
     
     if (basefreq==0){
     in.msr = 0xce;
@@ -441,7 +554,18 @@ int showcpuinfo(){
           maxturbofreq =(double)(out.param & 0xff) * 100.0;
         multturbofreq =(double)(out.param>>8 & 0xff) * 100.0;
         fourthturbofreq =(double)(out.param>>24 &0xff) * 100.0;
-        printf("CPU BaseFreq: %.0f, CPU MaxFreq(1/2/4): %.0f/%.0f/%.0f (mhz) \n",basefreq ,maxturbofreq,multturbofreq,fourthturbofreq);
+        sixthturbofreq =(double)(out.param>>40 &0xff) * 100.0;
+        eightthturbofreq =(double)(out.param>>56 &0xff) * 100.0;
+        if (eightthturbofreq!=0){
+            printf("CPU BaseFreq: %.0f, CPU MaxFreq(1/2/4/6/8): %.0f/%.0f/%.0f/%.0f/%.0f (mhz) \n",basefreq ,maxturbofreq,multturbofreq,fourthturbofreq,sixthturbofreq,eightthturbofreq);
+        }else if (sixthturbofreq!=0){
+             printf("CPU BaseFreq: %.0f, CPU MaxFreq(1/2/4/6): %.0f/%.0f/%.0f/%.0f (mhz) \n",basefreq ,maxturbofreq,multturbofreq,fourthturbofreq,sixthturbofreq);
+        }else {
+            printf("CPU BaseFreq: %.0f, CPU MaxFreq(1/2/4): %.0f/%.0f/%.0f (mhz)",basefreq ,maxturbofreq,multturbofreq,fourthturbofreq);
+        }
+        
+        printf("%s %s PL1: %.0fW PL2: %.0fW \n",oclocked?"OC_Locked":"",turbodisable?"Turbo_Disabled":"",p1power,p2power);
+        
     }
     
     
@@ -1639,7 +1763,210 @@ int main(int argc, const char * argv[])
             
 
         
-    }
+        }else if (!strncmp(parameter, "turbo", 5)){
+            
+            
+            inout in;
+            inout out;
+            size_t outsize = sizeof(out);
+            
+            
+            
+            
+            
+            
+            in.action = AnVMSRActionMethodRDMSR;
+            in.param = 0;
+            bool turbodisabled = false;
+            
+            
+            if (turbodisabled==false){
+                in.msr = 0x1a0;
+                ret = IOConnectCallStructMethod(connect,
+                                                AnVMSRActionMethodRDMSR,
+                                                &in,
+                                                sizeof(in),
+                                                &out,
+                                                &outsize
+                                                );
+                
+                if (ret != KERN_SUCCESS)
+                {
+                    printf("Can't read  0x1a0 ");
+                    
+                    return (1);
+                    
+                }
+                turbodisabled = (out.param >> 38 & 0x1)>0?true:false;
+                
+                
+                
+                
+                
+            }
+            
+            
+            
+            printf("Current Setting: Turbo Boost **%s\n",turbodisabled?"Disabled":"Enabled");
+            
+            if (argc <=2 ){
+                printf("------------------------------------------------------\n");
+              printf(" %s turbo 0 \n",argv[0]);
+                 printf(" for disable Intel turbo \n\n");
+              printf(" %s turbo 1 \n",argv[0]);
+                 printf(" for enable Intel turbo \n");
+              printf("------------------------------------------------------\n");
+                
+                return (0);
+                
+            }
+            
+            
+            if ((int)strtol((char *)argv[2],NULL,10)==0)
+                turbodisabled = 1;
+            else
+                turbodisabled = 0;
+            
+            out.param ^= (-(turbodisabled?1:0>>38 &0x1) ^ out.param) & (1UL << 38);
+            
+            
+            in.action = AnVMSRActionMethodWRMSR;
+            in.param = out.param;
+            
+            
+            
+            
+            
+            
+            ret = IOConnectCallStructMethod(connect,
+                                            AnVMSRActionMethodWRMSR,
+                                            &in,
+                                            sizeof(in),
+                                            &out,
+                                            &outsize
+                                            );
+            
+            
+            if (ret != KERN_SUCCESS)
+            {
+                printf("Can't connect to StructMethod to send commands\n");
+            }else{
+               printf("Modified Setting: Turbo Boost **%s\n",turbodisabled?"Disabled":"Enabled");
+            }
+            
+            
+            
+        } else if (!strncmp(parameter, "power", 5)){
+            
+            
+            
+            
+            inout in;
+            inout out;
+            size_t outsize = sizeof(out);
+            
+ 
+            
+            
+            
+            
+            in.action = AnVMSRActionMethodRDMSR;
+            in.param = 0;
+            
+            
+            double p1power =0;
+            double p2power =0;
+   
+   
+       
+            
+            if (p1power==0){
+                in.msr = 0x610;
+                ret = IOConnectCallStructMethod(connect,
+                                                AnVMSRActionMethodRDMSR,
+                                                &in,
+                                                sizeof(in),
+                                                &out,
+                                                &outsize
+                                                );
+                
+                if (ret != KERN_SUCCESS)
+                {
+                    printf("Can't read  0x610 ");
+                    
+                    return (1);
+                    
+                }
+                p1power = (double)(out.param & 0x7FFF ) / 8;
+                
+                p2power = (double)(out.param >> 32 & 0x7FFF ) / 8;
+                
+                
+                
+            }
+            
+            printf("Current Setting: PL1(Long term): %.fW, PL2(Short term) %.fW\n",p1power,p2power);
+            
+            
+            if (argc <=3 ){
+                     printf(" %s power <PL1> <PL2> \n",argv[0]);
+              printf("PL1 - long term power limited\n");
+              printf("PL2 - short term power limited\n");
+            printf("------------------------------------------------------\n");
+                return (1);
+            }
+            
+            int p1 = (int)strtol((char *)argv[2],NULL,10) *8;
+            int p2 = (int)strtol((char *)argv[3],NULL,10) *8;
+            
+            if (p1<5*8 || p2<5*8){
+                printf("your setting may too low, at least 5W \n");
+                return (1);
+            }
+                
+            
+  
+            
+            for(int i=0;i<15;i++){
+                out.param ^= (-(p1>>i &0x1) ^ out.param) & (1UL << i);
+            }
+            
+            for(int i=32;i<47;i++){
+                out.param ^= (-(p2>>i &0x1) ^ out.param) & (1UL << i);
+            }
+            
+            
+        
+            
+       
+            
+            
+            in.action = AnVMSRActionMethodWRMSR;
+            in.param = out.param;
+            
+      
+            
+            
+            
+            
+            ret = IOConnectCallStructMethod(connect,
+                                            AnVMSRActionMethodWRMSR,
+                                            &in,
+                                            sizeof(in),
+                                            &out,
+                                            &outsize
+                                            );
+            
+            
+            if (ret != KERN_SUCCESS)
+            {
+                printf("Can't connect to StructMethod to send commands\n");
+            }else{
+            printf("Modified Setting: PL1(Long term): %dW, PL2(Short term) %dW\n",p1/8,p2/8);
+            }
+            
+            
+        }
     else if (!strncmp(parameter, "read", 4))
     {
         
@@ -1673,6 +2000,8 @@ int main(int argc, const char * argv[])
         }
 
         printf("RDMSR %x returns value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)out.param);
+                printBits(sizeof(out.param), &out.param);
+        
     } else if (!strncmp(parameter, "write", 5)) {
         if (argc < 4)
         {
