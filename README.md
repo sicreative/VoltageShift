@@ -28,6 +28,15 @@ Build the command line tool:
 
 Usage
 --------
+
+New Versions 1.2:
+1. Updated for support up to 8 core CPU
+2. Updated setting of turbo boost
+3. Updated setting of power limited 
+4. Additional power limited and turbo boost status showed on -info 
+5. info showed as OC_Locked  mean Apple locked the BIOS and not aviliable change of voltage
+
+
 This program is a command tool that supports Haswell and above CPUs for undervoltage.
 
 It uses 'Intel Overclock Mailbox' for controling the voltage offset, 
@@ -107,6 +116,15 @@ Additional
    To set the MSR
    
      ./voltageshift write <HEX_MSR> <HEX_VALUE>
+     
+To set the Power Limted of PL1 (Long Term) and PL2 (Short Term)  
+    
+    ./voltageshift power <PL1> <PL2>
+     
+To set Turbo Enabled (0-no turbo 1-turbo):
+
+    ./voltageshift turbo <0/1>
+
  
    
 
