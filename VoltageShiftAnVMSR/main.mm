@@ -945,7 +945,7 @@ int showcpuinfo(){
     
 
     
-    uint64 temp = dtsmax - tempoffset - margintothrottle;
+    uint64 temp = dtsmax - margintothrottle;
     
     
     
