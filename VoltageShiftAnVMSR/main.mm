@@ -21,6 +21,8 @@
 #import <string>
 
 
+// SET TRUE WHEN YOUR SYSTEM REQUIRE OFFSET
+#define OFFSET_TEMP 0
 
 
 #define kAnVMSRClassName "VoltageShiftAnVMSR"
@@ -107,13 +109,13 @@ void usage(const char *name)
 {
     
     printf("--------------------------------------------------------------------------\n");
-    printf("VoltageShift Undervoltage Tool v 1.2 for Intel Haswell+ \n");
-    printf("Copyright (C) 2017 SC Lee \n");
+    printf("VoltageShift Undervoltage Tool v 1.21 for Intel Haswell+ \n");
+    printf("Copyright (C) 2019 SC Lee \n");
     printf("--------------------------------------------------------------------------\n");
 
     printf("Usage:\n");
     printf("set voltage:  \n    %s offset <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O>\n\n", name);
-    printf("set boot and auto apply:\n  sudo %s buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <UpdateMins (0 only apply at bootup)> \n\n", name);
+    printf("set boot and auto apply:\n  sudo %s buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <turbo> <pl1> <pl2>  <UpdateMins (0 only apply at bootup)>\n\n", name);
     printf("remove boot and auto apply:\n    %s removelaunchd \n\n", name);
      printf("get info of current setting:\n    %s info \n\n", name);
     printf("continuous monitor of CPU:\n    %s mon \n\n", name);
@@ -199,7 +201,7 @@ int writeOCMailBox (int domain,int offset){
         printf("VoltageShift offset Tool\n");
         printf("--------------------------------------------------------------------------\n");
         printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-        printf("Your settings are too low. Are you sure you want thosse values \n");
+        printf("Your settings are too low. Are you sure you want those values \n");
         printf("use --damaged for override\n");
         printf("     usage: voltageshift --damage offset ... for run\n");
         printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
@@ -947,6 +949,9 @@ int showcpuinfo(){
     
     uint64 temp = dtsmax - margintothrottle;
     
+    if (OFFSET_TEMP)
+        temp -= tempoffset;
+    
     
     
     printf("CPU Freq: %2.1fghz, Voltage: %.4fv, Power:pkg %2.2fw /core %2.2fw,Temp: %llu c", freq,voltage,powerpkg,powercore,temp);
@@ -962,17 +967,293 @@ int showcpuinfo(){
 
 
 
+
+
+
+
+int setPower(int argc,int p1,int p2){
+    
+                
+                
+    
+               inout in;
+               inout out;
+               size_t outsize = sizeof(out);
+               
+    
+               
+               kern_return_t ret;
+               
+               
+               in.action = AnVMSRActionMethodRDMSR;
+               in.param = 0;
+               
+               
+               double p1power =0;
+               double p2power =0;
+      
+      
+          
+               
+               if (p1power==0){
+                   in.msr = 0x610;
+                   ret = IOConnectCallStructMethod(connect,
+                                                   AnVMSRActionMethodRDMSR,
+                                                   &in,
+                                                   sizeof(in),
+                                                   &out,
+                                                   &outsize
+                                                   );
+                   
+                   if (ret != KERN_SUCCESS)
+                   {
+                       printf("Can't read  0x610 ");
+                       
+                       return (1);
+                       
+                   }
+                   p1power = (double)(out.param & 0x7FFF ) / 8;
+                   
+                   p2power = (double)(out.param >> 32 & 0x7FFF ) / 8;
+                   
+                   
+                   
+               }
+               
+               printf("Current Setting: PL1(Long term): %.fW, PL2(Short term) %.fW\n",p1power,p2power);
+               
+               
+               if (argc <=3){
+                
+                   return (1);
+               }
+               
+            
+                if (p1==-1 || p2==-1){
+                  
+                    return (1);
+                }
+    
+               
+               if (p1<5*8 || p2<5*8){
+                   printf("your setting may too low, at least 5W \n");
+                   return (1);
+               }
+                   
+               
+     
+               
+               for(int i=0;i<15;i++){
+                   out.param ^= (-(p1>>i &0x1) ^ out.param) & (1UL << i);
+               }
+               
+               for(int i=32;i<47;i++){
+                   out.param ^= (-(p2>>i &0x1) ^ out.param) & (1UL << i);
+               }
+               
+               
+           
+               
+          
+               
+               
+               in.action = AnVMSRActionMethodWRMSR;
+               in.param = out.param;
+               
+         
+               
+               
+               
+               
+               ret = IOConnectCallStructMethod(connect,
+                                               AnVMSRActionMethodWRMSR,
+                                               &in,
+                                               sizeof(in),
+                                               &out,
+                                               &outsize
+                                               );
+               
+               
+               if (ret != KERN_SUCCESS)
+               {
+                   printf("Can't connect to StructMethod to send commands\n");
+               }else{
+               printf("Modified Setting: PL1(Long term): %dW, PL2(Short term) %dW\n",p1/8,p2/8);
+               }
+    
+    return 1;
+}
+
+int setPower(int argc,const char * argv[]){
+
+    int p1 = 0;
+    int p2 = 0;
+    if (argc <=3 ){
+        printf(" %s power <PL1> <PL2> \n",argv[0]);
+        printf("PL1 - long term power limited\n");
+        printf("PL2 - short term power limited\n");
+        printf("------------------------------------------------------\n");
+    }else{
+    
+    p1 = (int)strtol((char *)argv[2],NULL,10) *8;
+    p2 = (int)strtol((char *)argv[3],NULL,10) *8;
+    }
+    return setPower(argc,p1,p2);
+    
+}
+
+
+
+int setTurbo(int argc,bool enable){
+    
+    inout in;
+    inout out;
+    size_t outsize = sizeof(out);
+    
+    
+    
+    
+    
+    
+    in.action = AnVMSRActionMethodRDMSR;
+    in.param = 0;
+    bool turbodisabled = false;
+    kern_return_t ret;
+    
+    if (turbodisabled==false){
+        in.msr = 0x1a0;
+        ret = IOConnectCallStructMethod(connect,
+                                        AnVMSRActionMethodRDMSR,
+                                        &in,
+                                        sizeof(in),
+                                        &out,
+                                        &outsize
+                                        );
+        
+        if (ret != KERN_SUCCESS)
+        {
+            printf("Can't read  0x1a0 ");
+            
+            return (1);
+            
+        }
+        turbodisabled = (out.param >> 38 & 0x1)>0?true:false;
+        
+        
+        
+        
+        
+    }
+    
+    
+    
+    printf("Current Setting: Turbo Boost **%s\n",turbodisabled?"Disabled":"Enabled");
+    
+    if (argc <=2 ){
+
+        
+        return (0);
+        
+    }
+    
+    
+    if (enable)
+        turbodisabled = 1;
+    else
+        turbodisabled = 0;
+    
+    out.param ^= (-(turbodisabled?1:0>>38 &0x1) ^ out.param) & (1UL << 38);
+    
+    
+    in.action = AnVMSRActionMethodWRMSR;
+    in.param = out.param;
+    
+    
+    
+    
+    
+    
+    ret = IOConnectCallStructMethod(connect,
+                                    AnVMSRActionMethodWRMSR,
+                                    &in,
+                                    sizeof(in),
+                                    &out,
+                                    &outsize
+                                    );
+    
+    
+    if (ret != KERN_SUCCESS)
+    {
+        printf("Can't connect to StructMethod to send commands\n");
+    }else{
+       printf("Modified Setting: Turbo Boost **%s\n",turbodisabled?"Disabled":"Enabled");
+    }
+    
+    return 1;
+    
+}
+
+int setTurbo(int argc,const char * argv[]){
+    
+    bool enable = true;
+    
+    if (argc <=2 ){
+        printf("------------------------------------------------------\n");
+      printf(" %s turbo 0 \n",argv[0]);
+         printf(" for disable Intel turbo \n\n");
+      printf(" %s turbo 1 \n",argv[0]);
+         printf(" for enable Intel turbo \n");
+      printf("------------------------------------------------------\n");
+        
+        
+        
+       
+        
+    }else{
+        
+
+        enable = (int)strtol((char *)argv[2],NULL,10)==0;
+        
+    }
+    return setTurbo(argc,enable);
+    
+}
+
+
 int setoffsetdaemons(int argc,const char * argv[]){
     
    
     
     
   
-    
+    int p1 = 0;
         
     for (int i=0;i<argc-2;i++){
 
+       // printf("%i %s ",i,argv[i+2]);
+        //Set turbo
+        if (i==6){
+            int value = (int)strtol((char *)argv[i+2],NULL,10);
+            if (value>=0)
+                setTurbo(3,value==0);
+            continue;
+        }
+        if (i==7){
+            p1 = (int)strtol((char *)argv[i+2],NULL,10) *8;
+             continue;
+          
+        }
+        
+        if (i==8){
+            if (p1!=0){
+                int p2 = (int)strtol((char *)argv[i+2],NULL,10) *8;
+                setPower(4, p1,p2);
+            }
+            continue;
+        }
+        
         int offset = (int)strtol((char *)argv[i+2],NULL,10);
+        
         if (readOCMailBox(i)!=offset){
              writeOCMailBox(i, offset);
         }
@@ -984,7 +1265,6 @@ int setoffsetdaemons(int argc,const char * argv[]){
     
     
 }
-
 
 
 
@@ -1268,7 +1548,7 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int min = 160  ) {
      output.str("");
     
     //add 0 for no user input field
-    for (int i=(int)values.size();i<=6;i++){
+    for (int i=(int)values.size();i<=5;i++){
         values.push_back(0);
         
     }
@@ -1466,6 +1746,11 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int min = 160  ) {
     printf("System Agency   %d %s mv\n",values[3],values[3]>0?"!!!!!":"");
     printf("Analog IO       %d %s mv\n",values[4],values[4]>0?"!!!!!":"");
     printf("Digital IO       %d %s mv\n",values[5],values[5]>0?"!!!!!":"");
+    if (values.size()>=7 && values[6]>=0)
+     printf("Turbo              %s \n",values[6]>0?"Enable":"Disable");
+    if (values.size()>=9 && values[7]>=0 && values[8]>=0)
+     printf("Power            %d  %d  \n",values[7],values[8]);
+    
     printf("--------------------------------------------------------------------------\n");
     printf("************************************************************************\n");
 
@@ -1746,9 +2031,15 @@ int main(int argc, const char * argv[])
                 arg.push_back((int)strtol((char *)argv[6],NULL,10));
             if (argc >=8)
                 arg.push_back((int)strtol((char *)argv[7],NULL,10));
-            if (argc >=9){
-                writeLaunchDaemons(arg,(int)strtol((char *)argv[8],NULL,10));
-            }else{
+            if (argc >=9)
+                arg.push_back((int)strtol((char *)argv[8],NULL,10));
+            if (argc >=10)
+                arg.push_back((int)strtol((char *)argv[9],NULL,10));
+            if (argc >=11)
+                arg.push_back((int)strtol((char *)argv[10],NULL,10));
+            if (argc >=12)
+                writeLaunchDaemons(arg,(int)strtol((char *)argv[11],NULL,10));
+            else{
             
             writeLaunchDaemons(arg);
             }
@@ -1766,93 +2057,7 @@ int main(int argc, const char * argv[])
         }else if (!strncmp(parameter, "turbo", 5)){
             
             
-            inout in;
-            inout out;
-            size_t outsize = sizeof(out);
-            
-            
-            
-            
-            
-            
-            in.action = AnVMSRActionMethodRDMSR;
-            in.param = 0;
-            bool turbodisabled = false;
-            
-            
-            if (turbodisabled==false){
-                in.msr = 0x1a0;
-                ret = IOConnectCallStructMethod(connect,
-                                                AnVMSRActionMethodRDMSR,
-                                                &in,
-                                                sizeof(in),
-                                                &out,
-                                                &outsize
-                                                );
-                
-                if (ret != KERN_SUCCESS)
-                {
-                    printf("Can't read  0x1a0 ");
-                    
-                    return (1);
-                    
-                }
-                turbodisabled = (out.param >> 38 & 0x1)>0?true:false;
-                
-                
-                
-                
-                
-            }
-            
-            
-            
-            printf("Current Setting: Turbo Boost **%s\n",turbodisabled?"Disabled":"Enabled");
-            
-            if (argc <=2 ){
-                printf("------------------------------------------------------\n");
-              printf(" %s turbo 0 \n",argv[0]);
-                 printf(" for disable Intel turbo \n\n");
-              printf(" %s turbo 1 \n",argv[0]);
-                 printf(" for enable Intel turbo \n");
-              printf("------------------------------------------------------\n");
-                
-                return (0);
-                
-            }
-            
-            
-            if ((int)strtol((char *)argv[2],NULL,10)==0)
-                turbodisabled = 1;
-            else
-                turbodisabled = 0;
-            
-            out.param ^= (-(turbodisabled?1:0>>38 &0x1) ^ out.param) & (1UL << 38);
-            
-            
-            in.action = AnVMSRActionMethodWRMSR;
-            in.param = out.param;
-            
-            
-            
-            
-            
-            
-            ret = IOConnectCallStructMethod(connect,
-                                            AnVMSRActionMethodWRMSR,
-                                            &in,
-                                            sizeof(in),
-                                            &out,
-                                            &outsize
-                                            );
-            
-            
-            if (ret != KERN_SUCCESS)
-            {
-                printf("Can't connect to StructMethod to send commands\n");
-            }else{
-               printf("Modified Setting: Turbo Boost **%s\n",turbodisabled?"Disabled":"Enabled");
-            }
+            setTurbo(argc,argv);
             
             
             
@@ -1861,109 +2066,7 @@ int main(int argc, const char * argv[])
             
             
             
-            inout in;
-            inout out;
-            size_t outsize = sizeof(out);
-            
- 
-            
-            
-            
-            
-            in.action = AnVMSRActionMethodRDMSR;
-            in.param = 0;
-            
-            
-            double p1power =0;
-            double p2power =0;
-   
-   
-       
-            
-            if (p1power==0){
-                in.msr = 0x610;
-                ret = IOConnectCallStructMethod(connect,
-                                                AnVMSRActionMethodRDMSR,
-                                                &in,
-                                                sizeof(in),
-                                                &out,
-                                                &outsize
-                                                );
-                
-                if (ret != KERN_SUCCESS)
-                {
-                    printf("Can't read  0x610 ");
-                    
-                    return (1);
-                    
-                }
-                p1power = (double)(out.param & 0x7FFF ) / 8;
-                
-                p2power = (double)(out.param >> 32 & 0x7FFF ) / 8;
-                
-                
-                
-            }
-            
-            printf("Current Setting: PL1(Long term): %.fW, PL2(Short term) %.fW\n",p1power,p2power);
-            
-            
-            if (argc <=3 ){
-                     printf(" %s power <PL1> <PL2> \n",argv[0]);
-              printf("PL1 - long term power limited\n");
-              printf("PL2 - short term power limited\n");
-            printf("------------------------------------------------------\n");
-                return (1);
-            }
-            
-            int p1 = (int)strtol((char *)argv[2],NULL,10) *8;
-            int p2 = (int)strtol((char *)argv[3],NULL,10) *8;
-            
-            if (p1<5*8 || p2<5*8){
-                printf("your setting may too low, at least 5W \n");
-                return (1);
-            }
-                
-            
-  
-            
-            for(int i=0;i<15;i++){
-                out.param ^= (-(p1>>i &0x1) ^ out.param) & (1UL << i);
-            }
-            
-            for(int i=32;i<47;i++){
-                out.param ^= (-(p2>>i &0x1) ^ out.param) & (1UL << i);
-            }
-            
-            
-        
-            
-       
-            
-            
-            in.action = AnVMSRActionMethodWRMSR;
-            in.param = out.param;
-            
-      
-            
-            
-            
-            
-            ret = IOConnectCallStructMethod(connect,
-                                            AnVMSRActionMethodWRMSR,
-                                            &in,
-                                            sizeof(in),
-                                            &out,
-                                            &outsize
-                                            );
-            
-            
-            if (ret != KERN_SUCCESS)
-            {
-                printf("Can't connect to StructMethod to send commands\n");
-            }else{
-            printf("Modified Setting: PL1(Long term): %dW, PL2(Short term) %dW\n",p1/8,p2/8);
-            }
+            setPower(argc,argv);
             
             
         }

@@ -28,6 +28,12 @@ Build the command line tool:
 
 Usage
 --------
+New Versions 1.21:
+1. Updated to support auto set Turbo / Power when startup  
+2. Default close "offset" for read temp. sensor. (As some system may have issue) [Charlyo]
+
+
+
 
 New Versions 1.2:
 1. Updated for support up to 8 core CPU
@@ -38,6 +44,8 @@ New Versions 1.2:
 
 
 This program is a command tool that supports Haswell and above CPUs for undervoltage.
+As Apple locked the OC capability for newer devices,  so if the info show "OC_Locked", you can not undervoltage, however you can close Turbo and set Power Limit to reduce heat.
+
 
 It uses 'Intel Overclock Mailbox' for controling the voltage offset, 
 Your system may be locked of the "OC Mailbox" and not be available for undervoltage.
@@ -75,7 +83,7 @@ If you set it too low the system will freeze, please turn OFF completely and tur
 
 After you test throughfuly the settings and are comfortable with System stability, you can apply the launchd: (require sudo root)
 
-    sudo ./voltageshift buildlaunchd  <CPU> <GPU> <CPUCache> <SystemAgency> <Analogy I/O> <Digital I/O> <Update Mins>
+    sudo ./voltageshift buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <turbo> <pl1> <pl2>  <UpdateMins (0 only apply at bootup)> 
 
 The <Update Mins> is the update interval of the tool to check and change, the Default value is 160min, Hibernate (suspend to Disk) will reset the voltage setting, as sleep (suspend to memory) will not change the sleep value, it will scheduled check the setting in peroid, and amend if need.
 
@@ -84,9 +92,19 @@ The <Update Mins> is the update interval of the tool to check and change, the De
     
 for example:
 
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 60
+    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 0 50 80 160
 
-set system auto apply CPU -50mv and GPU -50mv every boot and every 60 minutes.
+set system auto apply CPU -50mv and GPU -50mv, close Turbo, and set PL1 to 50, PL2 to 80, run every boot and every 160min .
+
+    sudo ./voltageshift buildlaunchd  0 0 0 0 0 0 0 -1
+
+switch off turbo only, run every boot and every 160min .
+
+    sudo ./voltageshift buildlaunchd  -20 0 -20 0 0 0 0 -1 -1 -1 0
+
+set system auto apply CPU -20mv and cache -20mv, run only boot .
+
+
 
 
 You can remove the launchd with the following command:
@@ -94,7 +112,7 @@ You can remove the launchd with the following command:
      ./voltageshift removelaunchd
      
      
-We also suggest to run first removelaunchd and them buildlaunchd if you want to change the launchd settings. 
+We  suggest to run first removelaunchd and them buildlaunchd if you want to change the launchd settings. 
 
 
 Additional

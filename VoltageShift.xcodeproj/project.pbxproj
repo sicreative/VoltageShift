@@ -214,6 +214,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = ABC74EF117983B9900B182E7;
@@ -405,13 +406,14 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1.2;
+				CURRENT_PROJECT_VERSION = 1.21;
 				DEVELOPMENT_TEAM = 7698T37TAB;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "VoltageShiftAnVMSR/VoltageShift-Prefix.pch";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "VoltageShiftAnVMSR/VoltageShift-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 1.21;
 				MODULE_NAME = com.sicreative.VoltageShiftAnVMSR;
 				MODULE_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.sicreative.${PRODUCT_NAME:rfc1034identifier}";
@@ -428,13 +430,14 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1.2;
+				CURRENT_PROJECT_VERSION = 1.21;
 				DEVELOPMENT_TEAM = 7698T37TAB;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "VoltageShiftAnVMSR/VoltageShift-Prefix.pch";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "VoltageShiftAnVMSR/VoltageShift-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 1.21;
 				MODULE_NAME = com.sicreative.VoltageShiftAnVMSR;
 				MODULE_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.sicreative.${PRODUCT_NAME:rfc1034identifier}";
