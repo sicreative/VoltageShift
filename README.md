@@ -28,6 +28,10 @@ Build the command line tool:
 
 Usage
 --------
+
+New Versions 1.22:
+1. Change read of timer from system api instead of MSR for improve of compatibility. 
+
 New Versions 1.21:
 1. Updated to support auto set Turbo / Power when startup  
 2. Default close "offset" for read temp. sensor. (As some system may have issue) [Charlyo]
