@@ -96,15 +96,15 @@ The <Update Mins> is the update interval of the tool to check and change, the De
     
 for example:
 
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 0 50 80 160
+    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 50 80 160
 
 set system auto apply CPU -50mv and GPU -50mv, close Turbo, and set PL1 to 50, PL2 to 80, run every boot and every 160min .
 
-    sudo ./voltageshift buildlaunchd  0 0 0 0 0 0 0 -1
+    sudo ./voltageshift buildlaunchd  0 0 0 0 0 0 -1
 
 switch off turbo only, run every boot and every 160min .
 
-    sudo ./voltageshift buildlaunchd  -20 0 -20 0 0 0 0 -1 -1 -1 0
+    sudo ./voltageshift buildlaunchd  -20 0 -20 0 0 0 -1 -1 -1 0
 
 set system auto apply CPU -20mv and cache -20mv, run only boot .
 
