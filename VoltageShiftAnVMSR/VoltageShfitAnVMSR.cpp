@@ -4,7 +4,6 @@
 
 
 // Replace used the system wdmsr
-
 /*
 #define rdmsr(msr,lo,hi) \
 __asm__ volatile("rdmsr" : "=a" (lo), "=d" (hi) : "c" (msr))
@@ -13,18 +12,25 @@ __asm__ volatile("rdmsr" : "=a" (lo), "=d" (hi) : "c" (msr))
 __asm__ volatile("wrmsr" : : "c" (msr), "a" (lo), "d" (hi))
 
 
+
 static inline uint64_t rdmsr64(uint32_t msr)
 {
 	uint64_t ret;
+#if TARGET_CPU_X86_64
 	__asm__ volatile("rdmsr" : "=A" (ret) : "c" (msr));
+#endif
 	return ret;
 }
 
 static inline void wrmsr64(uint32_t msr, uint64_t val)
 {
-	__asm__ volatile("wrmsr" : : "c" (msr), "A" (val));
-}*/
-
+    
+#if TARGET_CPU_X86_64
+    __asm__ volatile("wrmsr" : : "c" (msr), "A" (val));
+#endif
+	
+}
+ */
 #define super IOService
 OSDefineMetaClassAndStructors (VoltageShiftAnVMSR, IOService)
 
@@ -69,13 +75,23 @@ void VoltageShiftAnVMSR::stop (IOService *provider)
 
 uint64_t VoltageShiftAnVMSR::a_rdmsr (uint32_t msr)
 {
+#if TARGET_CPU_ARM64
+    return(0);
+ #elif TARGET_CPU_X86_64
     return(rdmsr64(msr));
+ #endif
+   
 }
 
 void VoltageShiftAnVMSR::a_wrmsr(uint32_t msr, uint64_t value)
 {
-
+  #if TARGET_CPU_ARM64
+    return;
+ #elif TARGET_CPU_X86_64
     wrmsr64(msr, value);
+ #endif
+
+    
 }
 
 IOReturn VoltageShiftAnVMSR::runAction(UInt32 action, UInt32 *outSize, void **outData, void *extraArg)
@@ -89,7 +105,16 @@ IOReturn VoltageShiftAnVMSR::runAction(UInt32 action, UInt32 *outSize, void **ou
 
 IOReturn VoltageShiftAnVMSR::newUserClient( task_t owningTask, void * securityID, UInt32 type, IOUserClient ** handler )
 {
+    
+#if TARGET_CPU_ARM64
+    IOLog("VoltageShiftAnVMSR: is not support Apple Silicon (ARM64)\n");
+    return(kIOReturnError);
+#endif
+    
     IOReturn ioReturn = kIOReturnSuccess;
+    
+    
+    
     AnVMSRUserClient *client = NULL;
 
     if (mClientCount > MAXUSERS)
@@ -345,6 +370,9 @@ IOReturn AnVMSRUserClient::actionMethodRDMSR(UInt32 *dataIn, UInt32 *dataOut, IO
 {
     inout * msrdata = (inout *)dataIn;
     inout * msroutdata = (inout *)dataOut;
+    
+    
+    
 
 #ifdef  DEBUG
     IOLog("AnVMSR RDMSR called\n");

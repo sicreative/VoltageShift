@@ -11,7 +11,12 @@
 
 // Added System wdmsr lib.
 #include <libkern/libkern.h>
-#include <i386/proc_reg.h>
+
+#if TARGET_CPU_X86_64
+    #include <i386/proc_reg.h>
+#endif
+   
+
 
 #define BUFSIZE 	512 	//bytes
 #define MAXENTRIES	500

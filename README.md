@@ -5,10 +5,13 @@ MSR Kext Driver modified from
 [AnVMSR](http://www.insanelymac.com/forum/topic/291833-anvmsr-v10-tool-and-driver-to-read-from-or-write-to-cpu-msr-registers/)
 by  Andy Vandijck Copyright (C) 2013 AnV Software
 
-    NOTICE: THIS TOOL IS FOR ADVANCED USERS AND MAY DAMAGE YOUR COMPUTER PERMANENTLY. 
+    NOTICE: THIS TOOL IS FOR ADVANCED USERS AND MAY DAMAGE YOUR COMPUTER PERMANENTLY.
+    
 
-You can download this software´s binary from our site -
-[VoltageShift](http://sitechprog.blogspot.com/2017/06/voltageshift.html)
+This App not support Apple Silicon.
+
+You can download this software´s binary from:
+[VoltageShift](voltageshift_1.24.zip)
 
 Building
 --------
@@ -28,6 +31,9 @@ Build the command line tool:
 
 Usage
 --------
+
+New Versions 1.24:
+1. Support Big Sur and Universial building on Xcode12 (load on Apple Silicon will simply exit )
 
 New Versions 1.22:
 1. Change read of timer from system api instead of MSR for improve of compatibility. 
@@ -67,6 +73,9 @@ Push `Cmd`+`R` when booting to Recovery mode, select Terminal at toolbar and ent
 After reboot, ensure the kext and the command tool files are in the same directory.
 
 
+For Big Sur, a diaglog will showed when first launch and tick the Grey button to System Preferences>Security & Privacy allow the kext, and reboot take effective.
+
+
 You can view your current voltage offset,CPU freqency,power and temperture settings with the following command:
 
     ./voltageshift info
@@ -96,7 +105,7 @@ The <Update Mins> is the update interval of the tool to check and change, the De
     
 for example:
 
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 0 50 80 160
+    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 0 1 50 80 160
 
 set system auto apply CPU -50mv and GPU -50mv, close Turbo, and set PL1 to 50, PL2 to 80, run every boot and every 160min .
 

@@ -18,7 +18,8 @@
 #import <Foundation/Foundation.h>
 #import <sstream>
 #import <vector>
-#import <string>
+#include "TargetConditionals.h"
+
 
 
 // SET TRUE WHEN YOUR SYSTEM REQUIRE OFFSET
@@ -253,7 +254,7 @@ int writeOCMailBox (int domain,int offset){
     in.action = AnVMSRActionMethodWRMSR;
     in.param = value;
     
-    printf("WRMSR %x with value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)in.param);
+   // printf("WRMSR %x with value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)in.param);
     
    // return (0);
     
@@ -305,7 +306,7 @@ int readOCMailBox (int domain){
     in.action = AnVMSRActionMethodWRMSR;
     in.param = value;
     
-    printf("WRMSR %x with value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)in.param);
+  //  printf("WRMSR %x with value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)in.param);
     
     
     
@@ -371,7 +372,7 @@ int readOCMailBox (int domain){
         break;
     }
     
-    printf("RDMSR %x returns value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)out.param);
+   // printf("RDMSR %x returns value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)out.param);
 
     int returnvalue = (int)(out.param >> 20) & 0xFFF;
     if (returnvalue > 2047){
@@ -1795,10 +1796,27 @@ void intHandler(int sig)
 
 int main(int argc, const char * argv[])
 {
+    
+    
+#if TARGET_CPU_ARM64
+    
+    
+    printf("\n\n\n\n\n");
+    printf("--------------------------------------------------------------------------\n");
+    printf("VoltageShift Don't support ARM (Apple Silicon)\n");
+    printf("--------------------------------------------------------------------------\n");
+    
+    return(1);
+    
+#endif
+    
     char * parameter;
     char * msr;
     char * regvalue;
     service = getService();
+    
+
+
  
     
     if (argc >= 2)
@@ -2103,7 +2121,7 @@ int main(int argc, const char * argv[])
             printf("Can't connect to StructMethod to send commands\n");
         }
 
-        printf("RDMSR %x returns value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)out.param);
+       // printf("RDMSR %x returns value 0x%llx\n", (unsigned int)in.msr, (unsigned long long)out.param);
                 printBits(sizeof(out.param), &out.param);
         
     } else if (!strncmp(parameter, "write", 5)) {
