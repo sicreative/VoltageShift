@@ -29,15 +29,12 @@ xcodebuild  -target voltageshift
 Usage
 --------
 
-This program is a command tool that supports Haswell and above CPUs for undervoltage.
-Apple locked the OC capability for newer devices, so if the info show "OC_Locked", you can not undervolt. You can still disable Turbo and set Power Limit to reduce heat.
+This program is a command tool that supports Haswell and above CPUs for undervoltage and TDP setting.
+Apple locked the OC capability for newer devices or firmware, if the info show "OC_Locked" mean not able to undervolt, however, you can still disable Turbo and set Power Limit to reduce heat.
 
 It uses the 'Intel Overclock Mailbox' for controling the voltage offset, 
-Your system may be locked of the "OC Mailbox" and not be available for undervoltage.
 
 Undervoltage can reduce heat and sustain Turbo boost longer, provide longer battery performance, although if done too much(mV) it may cause an unstable system.
-
-This program does not provide a GUI interface because it loads the MSR driver only when apply, amend or read is done, after that the MSR driver will load and unload immediately for more security and lowest resource usage, after you test the settings well, you can use our tools to build the launchd for autorun on startup and maintaining the settings, please read below for more details. 
 
 This program supports macOS 10.12 or above, however you need to switch off the SIP for unsigned kext in Recovery mode:
 
@@ -48,7 +45,7 @@ Push `Cmd`+`R` when booting to Recovery mode, select Terminal at toolbar and ent
 After reboot, ensure the kext and the command tool files are in the same directory.
 
 
-For Big Sur, a diaglog will showed when first launch and tick the Grey button to System Preferences>Security & Privacy allow the kext, and reboot take effective.
+For Big Sur, a diaglog will showed when first launched, tick Grey button redirect to System Preferences>Security & Privacy and allow the kext loaded, reboot take the effective.
 
 
 You can view your current voltage offset,CPU freqency,power and temperture settings with the following command:
@@ -67,7 +64,7 @@ for example reduced CPU -50mv and GPU -30mv
 
     ./voltageshift offset -50 -30
 
-If you set it too low the system will freeze, please turn OFF completely and turn ON computer to reset back the undervolt to 0mV.
+If you set too low the system will freeze, please turn OFF completely and turn ON computer to reset back the undervolt to 0mV.
 
 After you test throughfuly the settings and are comfortable with System stability, you can apply the launchd: (require sudo root)
 
@@ -93,10 +90,14 @@ You can remove the launchd with the following command:
 
      ./voltageshift removelaunchd
      
-We suggest to first run removelaunchd and then buildlaunchd if you want to change the launchd settings. 
+
 
 ChangeLog
 ---------
+
+Versions 1.24:
+1. Support Big Sur and Universial building on Xcode12 (load on Apple Silicon will simply exit )
+
 
 Version 1.22:
 1. Change read of timer from system api instead of MSR for improve of compatibility. 
