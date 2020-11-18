@@ -8,7 +8,7 @@ by  Andy Vandijck Copyright (C) 2013 AnV Software
     NOTICE: THIS TOOL IS FOR ADVANCED USERS AND MAY DAMAGE YOUR COMPUTER PERMANENTLY.
     
 
-This App not support Apple Silicon.
+This App is not support Apple Silicon.
 
 You can download this software´s binary from:
 [VoltageShift](voltageshift_1.24.zip)
