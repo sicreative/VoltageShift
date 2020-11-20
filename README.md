@@ -1,5 +1,6 @@
 # VoltageShift 
 Undervoltage Tools for MacOS (Haswell and Broadwell)<br />
+Change Turbo and Power Limit for most Intel platform Macbook
 All source code protected by      The GNU General Public License V 3.0   <br />
 MSR Kext Driver modified from 
 [AnVMSR](http://www.insanelymac.com/forum/topic/291833-anvmsr-v10-tool-and-driver-to-read-from-or-write-to-cpu-msr-registers/)
@@ -11,7 +12,7 @@ by  Andy Vandijck Copyright (C) 2013 AnV Software
 This App is not support Apple Silicon.
 
 You can download this software´s binary from:
-[VoltageShift](voltageshift_1.24.zip)
+[VoltageShift](voltageshift_1.25.zip)
 
 Building
 --------
@@ -30,7 +31,7 @@ Usage
 --------
 
 This program is a command tool that supports Haswell and above CPUs for undervoltage and TDP setting.
-Apple locked the OC capability for newer devices or firmware, if the info show "OC_Locked" mean not able to undervolt, however, you can still disable Turbo and set Power Limit to reduce heat.
+Apple locked the OC capability for newer devices or firmware, if the info show "OC_Locked" mean not able to undervolt, however, you can still disable Turbo and set Power Limit to reduce heat, fan noise or battery life.
 
 It uses the 'Intel Overclock Mailbox' for controling the voltage offset, 
 
@@ -68,15 +69,17 @@ If you set too low the system will freeze, please turn OFF completely and turn O
 
 After you test throughfuly the settings and are comfortable with System stability, you can apply the launchd: (require sudo root)
 
-    sudo ./voltageshift buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <turbo> <pl1> <pl2>  <UpdateMins (0 only apply at bootup)> 
+    sudo ./voltageshift buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <turbo> <pl1> <pl2> <remain> <UpdateMins (0 only apply at bootup)>
+    
+If remain is set to 1, the kext will remain on system     
 
 The <Update Mins> is the update interval of the tool to check and change, the Default value is 160min, Hibernate (suspend to Disk) will reset the voltage setting, as sleep (suspend to memory) will not change the sleep value, it will scheduled check the setting in peroid, and amend if need. *0 is for applying the setting at bootup only.*
 
 for example:
 
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 0 1 50 80 160
+    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 0 1 50 80 1 160
 
-set system auto apply CPU -50mv and GPU -50mv, close Turbo, and set PL1 to 50, PL2 to 80, run every boot and every 160min .
+set system auto apply CPU -50mv and GPU -50mv, close Turbo, and set PL1 to 50, PL2 to 80, run every boot and every 160min and kext remain on system .
 
     sudo ./voltageshift buildlaunchd  0 0 0 0 0 0 0 -1
 
@@ -90,10 +93,39 @@ You can remove the launchd with the following command:
 
      ./voltageshift removelaunchd
      
+For load the kext in current directory (remaining kext driver on system)
+ 
+    ./voltageshift loadkext
+
+or
+
+    sudo kextutil  -r ./  -b com.sicreative.VoltageShift
+    
+    
+For unload the kext 
+
+    ./voltageshift unloadkext
+
+or
+    
+    sudo kextunload -b com.sicreative.VoltageShift
+    
+For check the kext is loaded
+
+    kextstat | grep -v com.apple
+    
+should show "com.sicreative.VoltageShift"  on return.
+
+
+##Caution: Remaining the kext on system may violate system because other program may change the MSR without root (sudo) authorizing.
+
 
 
 ChangeLog
 ---------
+
+Versions 1.25:
+1. Support kext remaining on System
 
 Versions 1.24:
 1. Support Big Sur and Universial building on Xcode12 (load on Apple Silicon will simply exit )

@@ -54,6 +54,7 @@ double eightthturbofreq = 0;
 double power_units = 0;
 uint64 dtsmax = 0;
 uint64 tempoffset = 0;
+bool isUnloadOnEnd = false;
 
 
 
@@ -110,13 +111,13 @@ void usage(const char *name)
 {
     
     printf("--------------------------------------------------------------------------\n");
-    printf("VoltageShift Undervoltage Tool v 1.21 for Intel Haswell+ \n");
-    printf("Copyright (C) 2019 SC Lee \n");
+    printf("VoltageShift Undervoltage Tool v 1.25 for Intel Haswell+ \n");
+    printf("Copyright (C) 2020 SC Lee \n");
     printf("--------------------------------------------------------------------------\n");
 
     printf("Usage:\n");
     printf("set voltage:  \n    %s offset <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O>\n\n", name);
-    printf("set boot and auto apply:\n  sudo %s buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <turbo> <pl1> <pl2>  <UpdateMins (0 only apply at bootup)>\n\n", name);
+    printf("set boot and auto apply:\n  sudo %s buildlaunchd <CPU> <GPU> <CPUCache> <SA> <AI/O> <DI/O> <turbo> <pl1> <pl2> <remain> <UpdateMins (0 only apply at bootup)>\n\n", name);
     printf("remove boot and auto apply:\n    %s removelaunchd \n\n", name);
      printf("get info of current setting:\n    %s info \n\n", name);
     printf("continuous monitor of CPU:\n    %s mon \n\n", name);
@@ -1254,6 +1255,13 @@ int setoffsetdaemons(int argc,const char * argv[]){
             continue;
         }
         
+        if (i==9){
+            p1 = (int)strtol((char *)argv[i+2],NULL,10) *8;
+            if (p1)
+                isUnloadOnEnd = false;
+                
+        }
+            
         int offset = (int)strtol((char *)argv[i+2],NULL,10);
         
         if (readOCMailBox(i)!=offset){
@@ -1372,7 +1380,8 @@ void unloadkext() {
     
  
     
-  
+    if (!isUnloadOnEnd)
+        return;
     
     
     if(connect)
@@ -1400,6 +1409,8 @@ void unloadkext() {
 }
 
 void loadkext() {
+    
+    isUnloadOnEnd = true;
     
     std::stringstream output;
     output << "sudo kextutil -q -r ./  -b "
@@ -1631,7 +1642,7 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int min = 160  ) {
     << " ";
     system(output.str().c_str());
     
-    output.str("sudo chown  root:wheel /Library/LaunchDaemons/com.sicreative.VoltageShift.plist ");
+    output.str("sudo chown root:wheel /Library/LaunchDaemons/com.sicreative.VoltageShift.plist ");
     
      system(output.str().c_str());
  output.str("sudo mkdir  /Library/Application\\ Support/VoltageShift/ ");
@@ -1752,6 +1763,8 @@ void writeLaunchDaemons(std::vector<int>  values = {0},int min = 160  ) {
      printf("Turbo              %s \n",values[6]>0?"Enable":"Disable");
     if (values.size()>=9 && values[7]>=0 && values[8]>=0)
      printf("Power            %d  %d  \n",values[7],values[8]);
+    if (values.size()>=10 && values[9]>=0)
+        printf("The kext will %sremain on System when unload  \n",values[9]>0?"":"not ");
     
     printf("--------------------------------------------------------------------------\n");
     printf("************************************************************************\n");
@@ -1831,9 +1844,13 @@ int main(int argc, const char * argv[])
     
     int count = 0;
     while (!service && strncmp(parameter, "loadkext", 8) && strncmp(parameter, "unloadkext", 10) ){
-        loadkext();
-
+        
         service = getService();
+        
+        if (!service)
+            loadkext();
+
+        
         
         count++;
         
@@ -2022,6 +2039,7 @@ int main(int argc, const char * argv[])
             }
             
         }else if (!strncmp(parameter, "unloadkext", 10)){
+            isUnloadOnEnd = true;
             unloadkext();
        
             
@@ -2057,7 +2075,9 @@ int main(int argc, const char * argv[])
             if (argc >=11)
                 arg.push_back((int)strtol((char *)argv[10],NULL,10));
             if (argc >=12)
-                writeLaunchDaemons(arg,(int)strtol((char *)argv[11],NULL,10));
+                arg.push_back((int)strtol((char *)argv[11],NULL,10));
+            if (argc >=13)
+                writeLaunchDaemons(arg,(int)strtol((char *)argv[12],NULL,10));
             else{
             
             writeLaunchDaemons(arg);

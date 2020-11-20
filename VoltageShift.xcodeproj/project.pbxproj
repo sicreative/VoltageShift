@@ -29,6 +29,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6161C7612567D08000238E5B /* voltageshfit_1.25.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = voltageshfit_1.25.zip; sourceTree = "<group>"; };
 		6170B2B61EF2F59F00CD0ADD /* VoltageShiftAnVMSR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VoltageShiftAnVMSR.h; sourceTree = "<group>"; };
 		619B28DB25653ADA001E0668 /* voltageshift_1.24.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = voltageshift_1.24.zip; sourceTree = "<group>"; };
 		61C882121EFAFA77001DE175 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -78,6 +79,7 @@
 		ABC74EF117983B9900B182E7 = {
 			isa = PBXGroup;
 			children = (
+				6161C7612567D08000238E5B /* voltageshfit_1.25.zip */,
 				619B28DB25653ADA001E0668 /* voltageshift_1.24.zip */,
 				61C882121EFAFA77001DE175 /* README.md */,
 				AB3231E617E29BCB00043814 /* Frameworks */,
