@@ -77,7 +77,7 @@ The <Update Mins> is the update interval of the tool to check and change, the De
 
 for example:
 
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 0 1 50 80 1 160
+    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 0 0 1 50 80 1 160
 
 set system auto apply CPU -50mv and GPU -50mv, close Turbo, and set PL1 to 50, PL2 to 80, run every boot and every 160min and kext remain on system .
 
