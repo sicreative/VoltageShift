@@ -117,7 +117,7 @@ For check the kext is loaded
 should show "com.sicreative.VoltageShift"  on return.
 
 
-### Caution: Remaining the kext on system may violate system because other program may change the MSR without root (sudo) authorizing.
+#### Caution: Remaining the kext on system may violate system because other program may change the MSR without root (sudo) authorizing.
 
 
 
