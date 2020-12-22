@@ -12,7 +12,7 @@ by  Andy Vandijck Copyright (C) 2013 AnV Software
 This App is not support Apple Silicon.
 
 You can download this software´s binary from:
-[VoltageShift](voltageshift_1.25.zip)
+[VoltageShift](voltageshfit_1.25.zip)
 
 Building
 --------
