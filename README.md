@@ -11,8 +11,11 @@ by  Andy Vandijck Copyright (C) 2013 AnV Software
 
 This App is not support Apple Silicon.
 
-You can download this software´s binary from:
-[VoltageShift](voltageshift_1.25.zip)
+Notes
+--------
+**You must build this yourself from the Xcode project**, or else it will not work on your system due to not being signed by your own certificate. Any issues opened because of invalid signing will be closed. I modified this in order to allow for SIP to remain enabled by creating your own binaries that are therefore signed.
+
+The version of VoltageShift contained in this repository is modified in order to account for VoltageShift.kext being loaded into your EFI folder and config.plist. **You must load the kext into your EFI for this version to work.**
 
 Building
 --------
@@ -27,6 +30,8 @@ sudo chown -R root:wheel build/Release/VoltageShift.kext
 xcodebuild  -target voltageshift
 ```
 
+**After you build the kext, be sure to load it into your EFI.**
+
 Usage
 --------
 
@@ -37,17 +42,7 @@ It uses the 'Intel Overclock Mailbox' for controling the voltage offset,
 
 Undervoltage can reduce heat and sustain Turbo boost longer, provide longer battery performance, although if done too much(mV) it may cause an unstable system.
 
-This program supports macOS 10.12 or above, however you need to switch off the SIP for unsigned kext in Recovery mode:
-
-Push `Cmd`+`R` when booting to Recovery mode, select Terminal at toolbar and enter: 
-    
-    csrutil enable --without kext
-    
-After reboot, ensure the kext and the command tool files are in the same directory.
-
-
-For Big Sur, a diaglog will showed when first launched, tick Grey button redirect to System Preferences>Security & Privacy and allow the kext loaded, reboot take the effective.
-
+This program supports macOS 10.12 or above.
 
 You can view your current voltage offset,CPU freqency,power and temperture settings with the following command:
 
@@ -77,9 +72,13 @@ The <Update Mins> is the update interval of the tool to check and change, the De
 
 for example:
 
-    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 0 0 1 50 80 1 160
+    sudo ./voltageshift buildlaunchd  -50 -50 0 0 0 0 1 50 80 1 160
 
-set system auto apply CPU -50mv and GPU -50mv, close Turbo, and set PL1 to 50, PL2 to 80, run every boot and every 160min and kext remain on system .
+set system auto apply CPU -50mv and GPU -50mv, close Turbo, and set PL1 to 50, PL2 to 80, run every boot and every 160min and kext remain on system.
+
+    sudo ./voltageshift buildlaunchd -160 -30 -150 0 0 0 1 45 80 1 160
+
+set system auto apply CPU -160mv, GPU -30mv, CPU Cache -50mv, no turbo, PL1 at 45W, PL2 at 80W, run on boot and every 160min, kext remains on system.
 
     sudo ./voltageshift buildlaunchd  0 0 0 0 0 0 0 -1
 
@@ -93,22 +92,6 @@ You can remove the launchd with the following command:
 
      ./voltageshift removelaunchd
      
-For load the kext in current directory (remaining kext driver on system)
- 
-    ./voltageshift loadkext
-
-or
-
-    sudo kextutil  -r ./  -b com.sicreative.VoltageShift
-    
-    
-For unload the kext 
-
-    ./voltageshift unloadkext
-
-or
-    
-    sudo kextunload -b com.sicreative.VoltageShift
     
 For check the kext is loaded
 
@@ -123,6 +106,9 @@ should show "com.sicreative.VoltageShift"  on return.
 
 ChangeLog
 ---------
+
+Versions 1.26:
+1. Modified to allow for EFI loading of kext.
 
 Versions 1.25:
 1. Support kext remaining on System
