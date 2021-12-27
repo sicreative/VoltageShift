@@ -1376,59 +1376,6 @@ int setoffset(int argc,const char * argv[]){
 }
 
 
-void unloadkext() {
-    
- 
-    
-    if (!isUnloadOnEnd)
-        return;
-    
-    
-    if(connect)
-    {
-       kern_return_t ret = IOServiceClose(connect);
-        if (ret != KERN_SUCCESS)
-        {
-          
-        }
-    }
-    
-    if(service)
-        IOObjectRelease(service);
-    
-
-
-    
-    std::stringstream output;
-    output << "sudo kextunload -q -b "
-      << "com.sicreative.VoltageShift"
-    << " " ;
-    
-    system(output.str().c_str());
-
-}
-
-void loadkext() {
-    
-    isUnloadOnEnd = true;
-    
-    std::stringstream output;
-    output << "sudo kextutil -q -r ./  -b "
-    << "com.sicreative.VoltageShift"
-    << " " ;
-
-    system(output.str().c_str());
-    
-    output.str("");
-    
-    output << "sudo kextutil -q -r /Library/Application\\ Support/VoltageShift/ -b "
-    << "com.sicreative.VoltageShift"
-    << " " ;
-    
-    system(output.str().c_str());
-    
-    
-}
 
 void removeLaunchDaemons(){
     std::stringstream output;
@@ -1797,8 +1744,6 @@ void intHandler(int sig)
     c = getchar();
     if (c == 'y' || c == 'Y'){
         
-            unloadkext();
-        
         exit(0);
     }
     else
@@ -1840,23 +1785,6 @@ int main(int argc, const char * argv[])
         usage(argv[0]);
         
         return(1);
-    }
-    
-    int count = 0;
-    while (!service && strncmp(parameter, "loadkext", 8) && strncmp(parameter, "unloadkext", 10) ){
-        
-        service = getService();
-        
-        if (!service)
-            loadkext();
-
-        
-        
-        count++;
-        
-        // Try load 10 times, otherwise error return
-        if (count > 10)
-            return (1);
     }
 		
     
@@ -1933,7 +1861,6 @@ int main(int argc, const char * argv[])
                     for (int i=0;i<5;i++){
                     
                     sleep(1);
-                        loadkext();
                         service = getService();
                     kern_return_t ret;
                     //io_connect_t connect = 0;
@@ -2037,17 +1964,6 @@ int main(int argc, const char * argv[])
                     
                 }
             }
-            
-        }else if (!strncmp(parameter, "unloadkext", 10)){
-            isUnloadOnEnd = true;
-            unloadkext();
-       
-            
-        
-        }else if (!strncmp(parameter, "loadkext", 8)){
-            loadkext();
-            return 0;
-            
             
         }else if (!strncmp(parameter, "removelaunchd", 13)){
             removeLaunchDaemons();
@@ -2198,10 +2114,6 @@ int main(int argc, const char * argv[])
         
         if(service)
             IOObjectRelease(service);
-    
-    
-
-        unloadkext();
 
     
 
